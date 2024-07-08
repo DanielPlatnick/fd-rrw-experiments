@@ -33,6 +33,8 @@ def main():
 
     ehc = ALGORITHMS[0]
     gbfs = ALGORITHMS[2]
+
+    # need to fix parsing arguments
     custom_random_gbfs = [
     "--evaluator", "h=ff()",
     "--search", "lazy_greedy([h], randomize_successors=true, random_seed=5)"
@@ -42,13 +44,14 @@ def main():
     domain_list = ['blocks', 'movie', 'depot', 'freecell', 'transport', 'parcprinter', 'tpp', 'woodworking', 'pegsol', 
                    'gripper', 'elevators', 'psr-small', 'zenotravel', 'scanalyzer', 'airport', 'satellite', 'rovers', 
                    'openstacks', 'logistics', 'sokoban', 'miconic']
+    
 
     print(domain_list)
 
 
-    run_experiments_across_domains(algorithm=ehc, domains=domain_list[:3], start_task=1, stop_task=4, num_runs=3)
-    run_experiments_across_domains(algorithm=gbfs, domains=domain_list[:3], start_task=1, stop_task=4, num_runs=3)
-    run_experiments_across_domains(algorithm=custom_random_gbfs, domains=domain_list[:3], start_task=1, stop_task=4, num_runs=3)
+    run_experiments_across_domains(algorithm=ehc, domains=domain_list, start_task=1, stop_task=4, num_runs=3)
+    run_experiments_across_domains(algorithm=gbfs, domains=domain_list, start_task=1, stop_task=4, num_runs=3)
+    # run_experiments_across_domains(algorithm=custom_random_gbfs, domains=domain_list[:3], start_task=1, stop_task=4, num_runs=3)
 
 
 
