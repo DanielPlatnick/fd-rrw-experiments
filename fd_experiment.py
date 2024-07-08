@@ -1,24 +1,30 @@
-import subprocess
+from python_utils import *
 
-# Define the path to the Fast Downward executable
-FAST_DOWNWARD_PATH = "./fast-downward.py"
 
-# Define the path to the domain and problem files
-DOMAIN_FILE = "./benchmarks/blocks/domain.pddl"
-PROBLEM_FILE = "./benchmarks/blocks/task01.pddl"
+def main():
 
-# Define the search algorithm
-ALGORITHM = "ehc(ff())"
 
-# Function to run Fast Downward
-def run_fast_downward(domain_file, problem_file, search_algorithm):
-    command = [
-        FAST_DOWNWARD_PATH, domain_file, problem_file, "--search", search_algorithm
-    ]
-    process = subprocess.run(command, capture_output=True, text=True)
-    return process.stdout
+    # Define the base directory where the domains and their tasks are stored
+    # base_dir = "./benchmarks"
+    # Define the path to the Fast Downward executable
+    # fast_downward_path = "./fast-downward.py"
 
-# Running the planner
-output = run_fast_downward(DOMAIN_FILE, PROBLEM_FILE, ALGORITHM)
-print("Output from Fast Downward:")
-print(output)
+    # Define the search algorithms to use
+    ALGORITHMS = [["ehc(ff())"], ['astar(ff())']]
+
+    ehc = ALGORITHMS[0]
+    a_star = ALGORITHMS[1]
+    domain = 'blocks'
+
+    ehc_results_path = 'experiment_output/results_ehc.json'
+    a_star_results_path = 'experiment_output/results_astar.json'
+
+
+    results = perform_experiments(ehc, domain, start_task=1, end_task=7, num_runs=3)  # Example: Run tasks 1 to 3 in the 'blocks' domain
+    save_results(results, ehc_results_path)
+
+    results_2 = perform_experiments(a_star, domain, start_task=1, end_task=7, num_runs=3)
+    save_results(results_2, a_star_results_path)
+
+if __name__ == "__main__":
+    main()
