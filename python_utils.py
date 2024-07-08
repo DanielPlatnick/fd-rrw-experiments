@@ -45,6 +45,8 @@ def run_fast_downward(fast_downward_path, domain_file, problem_file, search_algo
     process = subprocess.run(command, capture_output=True, text=True)
     return extract_relevant_data(process.stdout)
 
+
+
 # Function to perform experiments dynamically
 def perform_experiments(test_algorithm, domain_name, start_task, end_task, num_runs, fast_downward_path="./fast-downward.py", base_dir="./benchmarks"):
 
