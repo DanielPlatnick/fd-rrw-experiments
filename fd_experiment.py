@@ -13,18 +13,21 @@ def main():
     ALGORITHMS = [["ehc(ff())"], ['astar(ff())']]
 
     ehc = ALGORITHMS[0]
-    a_star = ALGORITHMS[1]
-    domain = 'blocks'
+    # a_star = ALGORITHMS[1]
 
-    ehc_results_path = 'experiment_output/results_ehc.json'
-    a_star_results_path = 'experiment_output/results_astar.json'
+    domain_list = [domain for domain in os.listdir('benchmarks') if domain != 'README.md' and domain != 'experiment_output']
+
+    print(domain_list)
 
 
-    results = perform_experiments(ehc, domain, start_task=1, end_task=7, num_runs=3)  # Example: Run tasks 1 to 3 in the 'blocks' domain
+    domain = 'scanalyzer'
+
+
+    ehc_results_path = 'benchmarks/experiment_output/results_ehc.json'
+
+    results = perform_experiments(ehc, domain, start_task=1, end_task=15, num_runs=3)  # Example: Run tasks 1 to 3 in the 'blocks' domain
     save_results(results, ehc_results_path)
 
-    results_2 = perform_experiments(a_star, domain, start_task=1, end_task=7, num_runs=3)
-    save_results(results_2, a_star_results_path)
 
 if __name__ == "__main__":
     main()
