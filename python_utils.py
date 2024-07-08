@@ -23,7 +23,14 @@ def extract_relevant_data(raw_output):
         elif 'Total time:' in line:
             metrics['total_time'] = line.split()[-1]
         elif 'Plan length:' in line:
-            metrics['plan_length'] = line.split()[-1]
+            # metrics['plan_length'] = line.split()[-1]
+            parts = line.split("Plan length:")
+            if len(parts) > 1:
+            # Further split to get the number part before 'step(s)'
+                number_part = parts[1].split("step(s)")[0].strip()    
+                metrics['plan_length'] = number_part     
+
+
         elif 'Plan cost:' in line:
             metrics['plan_cost'] = line.split()[-1]
         elif 'Expanded' in line:
