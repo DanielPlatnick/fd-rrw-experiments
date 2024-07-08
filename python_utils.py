@@ -138,6 +138,12 @@ def run_experiments(domain_file, problem_file, problem_name, test_algorithm, num
             results[domain_name][problem_name][algorithm].append(output)
             print(f"Finished Run {run+1} for {problem_name} using {algorithm}.")
 
+
+def run_experiments_across_domains(algorithm, domains, start_task, stop_task, num_runs, fast_downward_path="./fast-downward.py", base_dir="./benchmarks"):
+    for domain in domains:
+        results_path = f"{base_dir}/experiment_output/results_{algorithm[0].split('(')[0]}_{domain}.json"
+        results = perform_experiments(algorithm, domain, start_task, stop_task, num_runs, fast_downward_path, base_dir)
+        save_results(results, results_path)
         
 
 # Function to save results to a JSON file

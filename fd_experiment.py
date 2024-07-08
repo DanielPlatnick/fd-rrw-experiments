@@ -1,13 +1,5 @@
 from python_utils import *
-
-
-def run_experiments_across_domains(algorithm, domains, start_task, stop_task, num_runs, fast_downward_path="./fast-downward.py", base_dir="./benchmarks"):
-    for domain in domains:
-        results_path = f"{base_dir}/experiment_output/results_{algorithm[0].split('(')[0]}_{domain}.json"
-        results = perform_experiments(algorithm, domain, start_task, stop_task, num_runs, fast_downward_path, base_dir)
-        save_results(results, results_path)
         
-
 
 def main():
 
@@ -27,12 +19,13 @@ def main():
         ["ehc(ff())"], 
         ['astar(ff())'], 
         ["eager_greedy([ff()], boost=100)"], 
-        ["lazy_greedy([h], randomize_successors=true, random_seed=5)"]
+        ["ehcrw(ff())"]
     ]
 
 
     ehc = ALGORITHMS[0]
     gbfs = ALGORITHMS[2]
+    ehcrw = ALGORITHMS[3]
 
     # need to fix parsing arguments
     custom_random_gbfs = [
@@ -45,12 +38,15 @@ def main():
                    'gripper', 'elevators', 'psr-small', 'zenotravel', 'scanalyzer', 'airport', 'satellite', 'rovers', 
                    'openstacks', 'logistics', 'sokoban', 'miconic']
     
+    # ehc is bad at depot
+    domain_list.remove('depot')
 
     print(domain_list)
 
 
-    run_experiments_across_domains(algorithm=ehc, domains=domain_list, start_task=1, stop_task=4, num_runs=3)
-    run_experiments_across_domains(algorithm=gbfs, domains=domain_list, start_task=1, stop_task=4, num_runs=3)
+    run_experiments_across_domains(algorithm=ehc, domains=domain_list, start_task=1, stop_task=3, num_runs=1)
+    # run_experiments_across_domains(algorithm=ehcrw, domains=domain_list, start_task=1, stop_task=3, num_runs=1)
+    # run_experiments_across_domains(algorithm=gbfs, domains=domain_list, start_task=1, stop_task=10, num_runs=2)
     # run_experiments_across_domains(algorithm=custom_random_gbfs, domains=domain_list[:3], start_task=1, stop_task=4, num_runs=3)
 
 
