@@ -91,7 +91,7 @@ void EnforcedHillClimbingRRWSearch::reach_state(
 
 void EnforcedHillClimbingRRWSearch::initialize() {
     assert(evaluator);
-    log << "Conducting enforced hill-climbing search, (real) bound = "
+    log << "Conducting enforced hill-climbing random walk search, (real) bound = "
         << bound << endl;
     if (use_preferred) {
         log << "Using preferred operators for "
@@ -258,10 +258,10 @@ void EnforcedHillClimbingRRWSearch::print_statistics() const {
     }
 }
 
-class EnforcedHillClimbingSearchFeature
+class EnforcedHillClimbingRRWSearchFeature
     : public plugins::TypedFeature<SearchAlgorithm, EnforcedHillClimbingRRWSearch> {
 public:
-    EnforcedHillClimbingSearchFeature() : TypedFeature("ehcrrw") {
+    EnforcedHillClimbingRRWSearchFeature() : TypedFeature("ehcrrw") {
         document_title("Lazy enforced hill-climbing random walk search");
         document_synopsis("");
 
@@ -289,7 +289,7 @@ public:
     }
 };
 
-static plugins::FeaturePlugin<EnforcedHillClimbingSearchFeature> _plugin;
+static plugins::FeaturePlugin<EnforcedHillClimbingRRWSearchFeature> _plugin;
 
 static plugins::TypedEnumPlugin<PreferredUsage> _enum_plugin({
         {"prune_by_preferred",

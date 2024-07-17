@@ -525,6 +525,19 @@ create_fast_downward_library(
 )
 
 create_fast_downward_library(
+    NAME enforced_hill_climbing_rrw_search
+    HELP "Lazy enforced hill-climbing search random walk search"
+    SOURCES
+        search_algorithms/enforced_hill_climbing_rrw_search
+    DEPENDS
+        g_evaluator
+        ordered_set
+        pref_evaluator
+        search_common
+        successor_generator
+)
+
+create_fast_downward_library(
     NAME iterated_search
     HELP "Iterated search"
     SOURCES

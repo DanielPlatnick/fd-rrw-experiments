@@ -19,13 +19,13 @@ def main():
         ["ehc(ff())"], 
         ['astar(ff())'], 
         ["eager_greedy([ff()], boost=100)"], 
-        ["ehcrw(ff())"]
+        ["ehcrrw(ff())"]
     ]
 
 
     ehc = ALGORITHMS[0]
     gbfs = ALGORITHMS[2]
-    ehcrw = ALGORITHMS[3]
+    ehcrrw = ALGORITHMS[3]
 
     # need to fix parsing arguments
     custom_random_gbfs = [
@@ -41,11 +41,11 @@ def main():
     # ehc is bad at depot
     domain_list.remove('depot')
 
-    print(domain_list)
+    print(domain_list[:4])
 
 
-    run_experiments_across_domains(algorithm=ehc, domains=domain_list, start_task=1, stop_task=3, num_runs=1)
-    # run_experiments_across_domains(algorithm=ehcrw, domains=domain_list, start_task=1, stop_task=3, num_runs=1)
+    # run_experiments_across_domains(algorithm=ehc, domains=domain_list, start_task=1, stop_task=3, num_runs=1)
+    run_experiments_across_domains(algorithm=ehcrrw, domains=domain_list, start_task=1, stop_task=3, num_runs=2)
     # run_experiments_across_domains(algorithm=gbfs, domains=domain_list, start_task=1, stop_task=10, num_runs=2)
     # run_experiments_across_domains(algorithm=custom_random_gbfs, domains=domain_list[:3], start_task=1, stop_task=4, num_runs=3)
 
