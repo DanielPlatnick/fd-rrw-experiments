@@ -1,5 +1,5 @@
-#ifndef SEARCH_ALGORITHMS_ENFORCED_HILL_CLIMBING_SEARCH_H
-#define SEARCH_ALGORITHMS_ENFORCED_HILL_CLIMBING_SEARCH_H
+#ifndef SEARCH_ALGORITHMS_ENFORCED_HILL_CLIMBING_RRW_SEARCH_H
+#define SEARCH_ALGORITHMS_ENFORCED_HILL_CLIMBING_RRW_SEARCH_H
 
 #include "../evaluation_context.h"
 #include "../open_list.h"
@@ -15,7 +15,7 @@ namespace plugins {
 class Options;
 }
 
-namespace enforced_hill_climbing_search {
+namespace enforced_hill_climbing_rrw_search {
 enum class PreferredUsage {
     PRUNE_BY_PREFERRED,
     RANK_PREFERRED_FIRST
@@ -28,7 +28,7 @@ enum class PreferredUsage {
   an eager one. We hypothesize that both versions need to evaluate and store
   the same states anyways.
 */
-class EnforcedHillClimbingSearch : public SearchAlgorithm {
+class EnforcedHillClimbingRRWSearch : public SearchAlgorithm {
     std::unique_ptr<EdgeOpenList> open_list;
 
     std::shared_ptr<Evaluator> evaluator;
@@ -42,7 +42,7 @@ class EnforcedHillClimbingSearch : public SearchAlgorithm {
 
     // Statistics
     std::map<int, std::pair<int, int>> d_counts;
-    int num_ehc_phases;
+    int num_ehcrrw_phases;
     int last_num_expanded;
 
     void insert_successor_into_open_list(
@@ -53,14 +53,14 @@ class EnforcedHillClimbingSearch : public SearchAlgorithm {
     void expand(EvaluationContext &eval_context);
     void reach_state(
         const State &parent, OperatorID op_id, const State &state);
-    SearchStatus ehc();
+    SearchStatus ehcrrw();
 
 protected:
     virtual void initialize() override;
     virtual SearchStatus step() override;
 
 public:
-    EnforcedHillClimbingSearch(
+    EnforcedHillClimbingRRWSearch(
         const std::shared_ptr<Evaluator> &h,
         PreferredUsage preferred_usage,
         const std::vector<std::shared_ptr<Evaluator>> &preferred,

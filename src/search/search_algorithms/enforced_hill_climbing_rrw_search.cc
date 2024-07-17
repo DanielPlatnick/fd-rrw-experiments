@@ -1,4 +1,4 @@
-#include "enforced_hill_climbing_search.h"
+#include "enforced_hill_climbing_rrw_search.h"
 
 #include "../algorithms/ordered_set.h"
 #include "../evaluators/g_evaluator.h"
@@ -13,11 +13,11 @@
 using namespace std;
 using utils::ExitCode;
 
-namespace enforced_hill_climbing_search {
+namespace enforced_hill_climbing_rrw_search {
 using GEval = g_evaluator::GEvaluator;
 using PrefEval = pref_evaluator::PrefEvaluator;
 
-static shared_ptr<OpenListFactory> create_ehc_open_list_factory(
+static shared_ptr<OpenListFactory> create_ehcrrw_open_list_factory(
     utils::Verbosity verbosity, bool use_preferred,
     PreferredUsage preferred_usage) {
     /*
@@ -26,7 +26,7 @@ static shared_ptr<OpenListFactory> create_ehc_open_list_factory(
       search, not a uniform-cost search. So this seems to be a bug.
     */
     shared_ptr<Evaluator> g_evaluator = make_shared<GEval>(
-        "ehc.g_eval", verbosity);
+        "ehcrrw.g_eval", verbosity);
 
     if (!use_preferred ||
         preferred_usage == PreferredUsage::PRUNE_BY_PREFERRED) {
@@ -43,14 +43,14 @@ static shared_ptr<OpenListFactory> create_ehc_open_list_factory(
         */
         vector<shared_ptr<Evaluator>> evals = {
             g_evaluator, make_shared<PrefEval>(
-                "ehc.pref_eval", verbosity)};
+                "ehcrrw.pref_eval", verbosity)};
         return make_shared<tiebreaking_open_list::TieBreakingOpenListFactory>(
             evals, false, true);
     }
 }
 
 
-EnforcedHillClimbingSearch::EnforcedHillClimbingSearch(
+EnforcedHillClimbingRRWSearch::EnforcedHillClimbingRRWSearch(
     const shared_ptr<Evaluator> &h, PreferredUsage preferred_usage,
     const vector<shared_ptr<Evaluator>> &preferred,
     OperatorCost cost_type, int bound, double max_time,
@@ -62,7 +62,7 @@ EnforcedHillClimbingSearch::EnforcedHillClimbingSearch(
       preferred_usage(preferred_usage),
       current_eval_context(state_registry.get_initial_state(), &statistics),
       current_phase_start_g(-1),
-      num_ehc_phases(0),
+      num_ehcrrw_phases(0),
       last_num_expanded(-1) {
     for (const shared_ptr<Evaluator> &eval : preferred_operator_evaluators) {
         eval->get_path_dependent_evaluators(path_dependent_evaluators);
@@ -77,19 +77,19 @@ EnforcedHillClimbingSearch::EnforcedHillClimbingSearch(
                          preferred_operator_evaluators.end(), evaluator) !=
         preferred_operator_evaluators.end();
 
-    open_list = create_ehc_open_list_factory(
+    open_list = create_ehcrrw_open_list_factory(
         verbosity, use_preferred, preferred_usage)->create_edge_open_list();
 }
 
 
-void EnforcedHillClimbingSearch::reach_state(
+void EnforcedHillClimbingRRWSearch::reach_state(
     const State &parent, OperatorID op_id, const State &state) {
     for (Evaluator *evaluator : path_dependent_evaluators) {
         evaluator->notify_state_transition(parent, op_id, state);
     }
 }
 
-void EnforcedHillClimbingSearch::initialize() {
+void EnforcedHillClimbingRRWSearch::initialize() {
     assert(evaluator);
     log << "Conducting enforced hill-climbing search, (real) bound = "
         << bound << endl;
@@ -117,7 +117,7 @@ void EnforcedHillClimbingSearch::initialize() {
     current_phase_start_g = 0;
 }
 
-void EnforcedHillClimbingSearch::insert_successor_into_open_list(
+void EnforcedHillClimbingRRWSearch::insert_successor_into_open_list(
     const EvaluationContext &eval_context,
     int parent_g,
     OperatorID op_id,
@@ -132,7 +132,7 @@ void EnforcedHillClimbingSearch::insert_successor_into_open_list(
     statistics.inc_generated_ops();
 }
 
-void EnforcedHillClimbingSearch::expand(EvaluationContext &eval_context) {
+void EnforcedHillClimbingRRWSearch::expand(EvaluationContext &eval_context) {
     SearchNode node = search_space.get_node(eval_context.get_state());
     int node_g = node.get_g();
 
@@ -168,7 +168,7 @@ void EnforcedHillClimbingSearch::expand(EvaluationContext &eval_context) {
     node.close();
 }
 
-SearchStatus EnforcedHillClimbingSearch::step() {
+SearchStatus EnforcedHillClimbingRRWSearch::step() {
     last_num_expanded = statistics.get_expanded();
     search_progress.check_progress(current_eval_context);
 
@@ -177,10 +177,10 @@ SearchStatus EnforcedHillClimbingSearch::step() {
     }
 
     expand(current_eval_context);
-    return ehc();
+    return ehcrrw();
 }
 
-SearchStatus EnforcedHillClimbingSearch::ehc() {
+SearchStatus EnforcedHillClimbingRRWSearch::ehcrrw() {
     while (!open_list->empty()) {
         EdgeOpenListEntry entry = open_list->remove_min();
         StateID parent_state_id = entry.first;
@@ -217,7 +217,7 @@ SearchStatus EnforcedHillClimbingSearch::ehc() {
             node.open(parent_node, last_op, get_adjusted_cost(last_op));
 
             if (h < current_eval_context.get_evaluator_value(evaluator.get())) {
-                ++num_ehc_phases;
+                ++num_ehcrrw_phases;
                 if (d_counts.count(d) == 0) {
                     d_counts[d] = make_pair(0, 0);
                 }
@@ -238,13 +238,13 @@ SearchStatus EnforcedHillClimbingSearch::ehc() {
     return FAILED;
 }
 
-void EnforcedHillClimbingSearch::print_statistics() const {
+void EnforcedHillClimbingRRWSearch::print_statistics() const {
     statistics.print_detailed_statistics();
 
-    log << "EHC phases: " << num_ehc_phases << endl;
-    assert(num_ehc_phases != 0);
-    log << "Average expansions per EHC phase: "
-        << static_cast<double>(statistics.get_expanded()) / num_ehc_phases
+    log << "EHCRRW phases: " << num_ehcrrw_phases << endl;
+    assert(num_ehcrrw_phases != 0);
+    log << "Average expansions per EHCRRW phase: "
+        << static_cast<double>(statistics.get_expanded()) / num_ehcrrw_phases
         << endl;
 
     for (auto count : d_counts) {
@@ -252,17 +252,17 @@ void EnforcedHillClimbingSearch::print_statistics() const {
         int phases = count.second.first;
         assert(phases != 0);
         int total_expansions = count.second.second;
-        log << "EHC phases of depth " << depth << ": " << phases
+        log << "EHCRRW phases of depth " << depth << ": " << phases
             << " - Avg. Expansions: "
             << static_cast<double>(total_expansions) / phases << endl;
     }
 }
 
 class EnforcedHillClimbingSearchFeature
-    : public plugins::TypedFeature<SearchAlgorithm, EnforcedHillClimbingSearch> {
+    : public plugins::TypedFeature<SearchAlgorithm, EnforcedHillClimbingRRWSearch> {
 public:
-    EnforcedHillClimbingSearchFeature() : TypedFeature("ehc") {
-        document_title("Lazy enforced hill-climbing");
+    EnforcedHillClimbingSearchFeature() : TypedFeature("ehcrrw") {
+        document_title("Lazy enforced hill-climbing random walk search");
         document_synopsis("");
 
         add_option<shared_ptr<Evaluator>>("h", "heuristic");
@@ -274,13 +274,13 @@ public:
             "preferred",
             "use preferred operators of these evaluators",
             "[]");
-        add_search_algorithm_options_to_feature(*this, "ehc");
+        add_search_algorithm_options_to_feature(*this, "ehcrrw");
     }
 
-    virtual shared_ptr<EnforcedHillClimbingSearch> create_component(
+    virtual shared_ptr<EnforcedHillClimbingRRWSearch> create_component(
         const plugins::Options &opts,
         const utils::Context &) const override {
-        return plugins::make_shared_from_arg_tuples<EnforcedHillClimbingSearch>(
+        return plugins::make_shared_from_arg_tuples<EnforcedHillClimbingRRWSearch>(
             opts.get<shared_ptr<Evaluator>>("h"),
             opts.get<PreferredUsage>("preferred_usage"),
             opts.get_list<shared_ptr<Evaluator>>("preferred"),
