@@ -45,6 +45,7 @@ class EnforcedHillClimbingRRWSearch : public SearchAlgorithm {
     int num_ehcrrw_phases;
     int last_num_expanded;
 
+    void random_walk();
     void insert_successor_into_open_list(
         const EvaluationContext &eval_context,
         int parent_g,

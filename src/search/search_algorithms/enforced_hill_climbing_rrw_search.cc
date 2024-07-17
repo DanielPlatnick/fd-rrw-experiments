@@ -79,6 +79,11 @@ EnforcedHillClimbingRRWSearch::EnforcedHillClimbingRRWSearch(
 
     open_list = create_ehcrrw_open_list_factory(
         verbosity, use_preferred, preferred_usage)->create_edge_open_list();
+
+
+    // Test the random_walk function
+    random_walk();
+        
 }
 
 
@@ -257,6 +262,43 @@ void EnforcedHillClimbingRRWSearch::print_statistics() const {
             << static_cast<double>(total_expansions) / phases << endl;
     }
 }
+
+
+/*RANDOM WALK FUNCTIONALITY*/
+void EnforcedHillClimbingRRWSearch::random_walk() {
+    State current_state = current_eval_context.get_state();
+    std::vector<OperatorID> applicable_ops;
+    successor_generator.generate_applicable_ops(current_state, applicable_ops);
+
+    if (!applicable_ops.empty()) {
+        // Randomly select an operator from the list of applicable operators
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(0, applicable_ops.size() - 1);
+        OperatorID random_op = applicable_ops[dis(gen)];
+        OperatorProxy op = task_proxy.get_operators()[random_op];
+
+        // Apply the selected operator to generate the next state
+        State next_state = state_registry.get_successor_state(current_state, op);
+
+        // TESTING OUTPUT
+        std::cout << "\n---DEBUGGGGGGGGGGG---\n\n";
+
+
+
+        // Logging the random walk process
+        std::cout << "Random Walk: Moving from state [" << current_state.get_id() 
+                  << "] using operator [" << op.get_name() 
+                  << "] to state [" << next_state.get_id() << "]\n";
+
+        // Move to the next state in the random walk
+        current_eval_context = EvaluationContext(next_state, &statistics);
+    } else {
+        std::cout << "Random Walk: No applicable operations available from state [" 
+                  << current_state.get_id() << "].\n";
+    }
+}
+
 
 class EnforcedHillClimbingRRWSearchFeature
     : public plugins::TypedFeature<SearchAlgorithm, EnforcedHillClimbingRRWSearch> {
